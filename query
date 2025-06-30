@@ -1,0 +1,44 @@
+——— запрос 1 (Написать SQL запрос по отчету 2, который выведет клиентов с регионом выдачи онлайн и выданные в 2024 году) 
+
+SELECT "ClientID", "SubdivisionName", "issueDateTimestamp"
+FROM "Отчет_2"
+WHERE "SubdivisionName" = 'Онлайн'
+  AND EXTRACT(YEAR FROM "issueDateTimestamp") = 2024;
+
+——запрос 2 (Написать SQL запрос по отчету 2, который выведет три поля: статус, количество клиентов в статусе, сумму выданных займов в статусе
+)
+
+SELECT 
+    "Status",
+    COUNT("ClientID") AS "Количество клиентов",
+    SUM("LoanAmount") AS "Сумма выданных займов"
+FROM 
+    "Отчет_2"
+GROUP BY 
+    "Status"
+ORDER BY 
+    "Status";
+
+——запрос 3 (Написать SQL запрос, который выведет все поля отчета 1 и отчета 2)
+
+SELECT
+  o1."N",
+  o1."Номер контракта",
+  o2."ContractID",
+  o2."ClientID",
+  o2."SubdivisionName",
+  COALESCE(o1."Дата выдачи", o2."issueDateTimestamp") AS "Дата выдачи",
+  COALESCE(o1."Сумма выдачи", o2."LoanAmount") AS "Сумма выдачи",
+  
+  o1."Задолженность по ОД",
+  o1."Задолженность по %%",
+  o1."Кол-во дней просрочки фактическое",
+ 
+  o2."inner_lead_id",
+  o2."RepaymentPlanDate",
+  o2."Status",
+  o2."DateStatus",
+  o2."SumLastPay"
+FROM "Отчет_1" o1
+JOIN "Отчет_2" o2
+  ON CAST(o1."Номер контракта" AS INTEGER) = o2."NumContract";
